@@ -6,23 +6,16 @@ fi
 
 engine_label=$1
 
+apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
+apt-get install -y mc ntp software-properties-common apt-transport-https curl netfilter-persistent && \
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
+apt-key fingerprint 0EBFCD88 && \
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
 apt-get update && \
-apt-get upgrade -y && \
-apt-get dist-upgrade -y && \
-\
-apt-get install -y mc && \
-apt-get install -y ntp && \
-\
-apt-get install -y ca-certificates && \
-apt-get install -y software-properties-common && \
-apt-get install -y apt-transport-https && \
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D && \
-apt-add-repository 'deb https://apt.dockerproject.org/repo ubuntu-xenial main' && \
-apt-get update && \
-apt-get install -y docker-engine && \
-\
-apt-get install -y netfilter-persistent && \
+apt-get install -y docker-ce && \
 netfilter-persistent flush && \
+iptables -A INPUT -p tcp --dport 8080 -j ACCEPT && \
+iptables -A INPUT -p tcp --dport 9345 -j ACCEPT && \
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT && \
 iptables -A INPUT -p tcp --dport 2376 -j ACCEPT && \
 iptables -A INPUT -p tcp --dport 2377 -j ACCEPT && \
@@ -34,7 +27,7 @@ netfilter-persistent save && \
 echo 'export PS1="${debian_chroot:+($debian_chroot)}\u@\H:\w# "' >> ~/.bashrc && \
 PS1="${debian_chroot:+($debian_chroot)}\u@\H:\w# " && \
 \
-echo '{"labels": ["dc=${engine_label}"]}' >> /etc/docker/daemon.json && \
+echo '{"labels": ["dc='${engine_label}'"]}' >> /etc/docker/daemon.json && \
 service docker restart && \
 \
 echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config && \
