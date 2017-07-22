@@ -14,8 +14,6 @@ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(
 apt-get update && \
 apt-get install -y docker-ce && \
 netfilter-persistent flush && \
-iptables -A INPUT -p tcp --dport 8080 -j ACCEPT && \
-iptables -A INPUT -p tcp --dport 9345 -j ACCEPT && \
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT && \
 iptables -A INPUT -p tcp --dport 2376 -j ACCEPT && \
 iptables -A INPUT -p tcp --dport 2377 -j ACCEPT && \
