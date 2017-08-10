@@ -9,6 +9,8 @@ engine_label=$1
 apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update && \
 apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y && \
 apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade -y && \
+echo debconf iptables-persistent/autosave_done select true | debconf-set-selections && \
+echo debconf iptables-persistent/autosave_done seen true | debconf-set-selections && \
 apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y mc ntp software-properties-common apt-transport-https curl iptables-persistent netfilter-persistent && \
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
 apt-key fingerprint 0EBFCD88 && \
