@@ -6,8 +6,10 @@ fi
 
 engine_label=$1
 
-apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && \
-apt-get install -y mc ntp software-properties-common apt-transport-https curl iptables-persistent netfilter-persistent && \
+apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update && \
+apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y && \
+apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade -y && \
+apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y mc ntp software-properties-common apt-transport-https curl iptables-persistent netfilter-persistent && \
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
 apt-key fingerprint 0EBFCD88 && \
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
@@ -22,14 +24,9 @@ iptables -A INPUT -p udp --dport 7946 -j ACCEPT && \
 iptables -A INPUT -p udp --dport 4789 -j ACCEPT && \
 netfilter-persistent save && \
 \
-echo 'export PS1="${debian_chroot:+($debian_chroot)}\u@\H:\w# "' >> ~/.bashrc && \
-PS1="${debian_chroot:+($debian_chroot)}\u@\H:\w# " && \
-\
 echo '{"labels": ["dc='${engine_label}'"]}' >> /etc/docker/daemon.json && \
 service docker restart && \
 \
-echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config && \
-echo "TCPKeepAlive yes" >> /etc/ssh/sshd_config && \
-echo "ClientAliveCountMax 180" >> /etc/ssh/sshd_config && \
+echo -e "\nClientAliveInterval 60\nTCPKeepAlive yes\nClientAliveCountMax 180\n" >> /etc/ssh/sshd_config && \
 service sshd restart
 
