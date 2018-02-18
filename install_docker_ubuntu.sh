@@ -38,3 +38,6 @@ docker plugin install --alias weave weaveworks/net-plugin:latest_release
 
 echo -e "\nClientAliveInterval 60\nTCPKeepAlive yes\nClientAliveCountMax 180\n" >> /etc/ssh/sshd_config
 service sshd restart
+
+apt-get install -y ntp
+update-rc.d ntp enable && service ntp start
