@@ -4,17 +4,19 @@ filename=$1
 ADVERTISE_ADDR=$2
 DATA_PATH_ADDR=$3
 
-if [ ! -z "${filename}" ]; then
+if [ -z "${filename}" ]; then
   echo >&2 "Config file not specified"
   exit -1
 fi
 
-if [ ! -z "${ADVERTISE_ADDR}" ]; then
+if [ -z "${ADVERTISE_ADDR}" ]; then
   echo >&2 "ADVERTISE_ADDR not specified"
   exit -1
 fi
 
-: ${DATA_PATH_ADDR="${ADVERTISE_ADDR}"}
+if [[ ! "${DATA_PATH_ADDR}" ]]; then
+  DATA_PATH_ADDR="${ADVERTISE_ADDR}"
+fi
 
 SSH="$DEBUG ssh $SSH_KEY_OPT -kTax -q -o StrictHostKeyChecking=no"
 i=0
@@ -85,12 +87,15 @@ then
     exit 1
 fi
 
-#========================================================================================
+echo "========================================================================================"
 echo "Docker Setup Start"
+echo "========================================================================================"
 
 for i in `seq 0 $((NODE_COUNT-1))`
 do
-echo "install docker engine on node with IP ${IP_ADDRESS[$i]}"
+echo "========================================================================================"
+echo "Install docker engine on node with IP ${IP_ADDRESS[$i]}"
+echo "========================================================================================"
 
 $SSH root@${IP_ADDRESS[$i]} 'bash -s' <<-EODOCKER
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -115,12 +120,17 @@ EODOCKER
 
 done
 
+echo "========================================================================================"
 echo "Docker Setup Complete"
+echo "========================================================================================"
 
-#========================================================================================
+echo "========================================================================================"
 echo "Swarm Cluster Setup Start"
+echo "========================================================================================"
 
-echo "======> Initializing first swarm manager ..."
+echo "========================================================================================"
+echo "Initializing first swarm manager ..."
+echo "========================================================================================"
 $SSH root@${IP_ADDRESS[0]}  "docker swarm init --advertise-addr ${ADVERTISE_ADDR} --data-path-addr ${DATA_PATH_ADDR}"
 
 # Fetch Tokens
@@ -131,28 +141,37 @@ echo "Manager Token: ${ManagerToken}"
 echo "Workder Token: ${WorkerToken}"
 
 # Add remaining manager to swarm
-echo "======> Add other manager nodes"
+echo "Add other manager nodes"
 for i in `seq 1 $((MGR_COUNT-1))`
 do
-    echo "node with IP ${IP_ADDRESS[$i]} joins swarm as a Manager"
+    echo "========================================================================================"
+    echo "Node with IP ${IP_ADDRESS[$i]} joins swarm as a Manager"
+    echo "========================================================================================"
     $SSH root@${IP_ADDRESS[$i]} ${ManagerToken}
 done
 
 # Add worker to swarm
-echo "======> Add worker nodes"
+echo "Add worker nodes"
 for i in `seq $((MGR_COUNT)) $((NODE_COUNT-1))`
 do
-     echo "node with IP ${IP_ADDRESS[$i]} joins swarm as a Worker"
+     echo "========================================================================================"
+     echo "Node with IP ${IP_ADDRESS[$i]} joins swarm as a Worker"
+     echo "========================================================================================"
      $SSH root@${IP_ADDRESS[$i]} ${WorkerToken}
 done
 
 # list nodes in swarm cluster
+echo "========================================================================================"
 $SSH root@${IP_ADDRESS[0]} "docker node ls"
+echo "========================================================================================"
 
+echo "========================================================================================"
 echo "Swarm Cluster Setup Complete"
+echo "========================================================================================"
 
-#========================================================================================
+echo "========================================================================================"
 echo "Imagenarium Setup Start"
+echo "========================================================================================"
 
 $SSH root@${IP_ADDRESS[0]} 'bash -s' <<-EODOCKER
 docker network create --driver overlay --attachable clustercontrol-net
@@ -164,4 +183,6 @@ docker service create --detach=false -p 5555:8080 --name clustercontrol \
 imagenarium/clustercontrol:0.9.0
 EODOCKER
 
+echo "========================================================================================"
 echo "Imagenarium Setup Complete"
+echo "========================================================================================"
