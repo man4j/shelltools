@@ -116,6 +116,15 @@ docker plugin install --grant-all-permissions --alias vsphere vmware/vsphere-sto
 docker plugin install --grant-all-permissions --alias weave weaveworks/net-plugin:latest_release
 
 systemctl restart docker
+
+sysctl -w net.ipv4.tcp_keepalive_time=600
+sysctl -w net.ipv4.tcp_keepalive_intvl=60
+sysctl -w net.ipv4.tcp_keepalive_probes=3
+
+echo "net.ipv4.tcp_keepalive_time=600" >> /etc/sysctl.d/60-imagenarium.conf
+echo "net.ipv4.tcp_keepalive_intvl=60" >> /etc/sysctl.d/60-imagenarium.conf
+echo "net.ipv4.tcp_keepalive_probes=3" >> /etc/sysctl.d/60-imagenarium.conf
+
 EODOCKER
 
 done
