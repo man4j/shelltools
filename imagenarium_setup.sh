@@ -112,6 +112,8 @@ firewall-cmd --add-port=7946/udp --permanent
 firewall-cmd --add-port=4789/udp --permanent
 firewall-cmd --reload
 
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+
 docker plugin install --grant-all-permissions --alias vsphere vmware/vsphere-storage-for-docker:latest
 docker plugin install --grant-all-permissions --alias weave weaveworks/net-plugin:latest_release
 
