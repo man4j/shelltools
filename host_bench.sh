@@ -17,3 +17,8 @@ lscpu
 echo "Testing network speed..."
 wget -O /dev/null http://cachefly.cachefly.net/100mb.test
 
+#docker run -it --rm --name=iperf3-server --net host networkstatic/iperf3 -s
+#docker run  -it --rm --net host networkstatic/iperf3 -c 10.3.33.1
+
+#docker run -it --rm --name=iperf3-server --network clustercontrol-net networkstatic/iperf3 -s
+#docker run  -it --rm --network clustercontrol-net networkstatic/iperf3 -c iperf3-server
