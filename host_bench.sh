@@ -14,11 +14,12 @@ echo "Testing reading with cache..."
 dd if=diskbench of=/dev/null bs=1M count=1024
 rm -f diskbench
 
-#grep -E '^model name|^cpu MHz' /proc/cpuinfo
 echo "Testing cpu..."
+grep -E '^model name|^cpu MHz' /proc/cpuinfo
 dd if=/dev/zero bs=1M count=1024 | md5sum
 echo "CPU info:"
 lscpu
+
 echo "Testing network speed..."
 wget -O /dev/null http://cachefly.cachefly.net/100mb.test
 
