@@ -28,3 +28,13 @@ wget -O /dev/null http://cachefly.cachefly.net/100mb.test
 
 #docker run -it --rm --name=iperf3-server --network clustercontrol-net networkstatic/iperf3 -s
 #docker run  -it --rm --network clustercontrol-net networkstatic/iperf3 -c iperf3-server
+
+
+#sysbench
+
+curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.rpm.sh | sudo bash
+sudo yum -y install sysbench
+
+sysbench fileio prepare
+sysbench fileio --file-test-mode=rndrw run
+sysbench fileio cleanup
